@@ -1,8 +1,6 @@
 {% extends "lib/webinterface/fragments/layout.tpl" %}
 {% import "lib/webinterface/fragments/macros.tpl" as macros%}
-{% block head_css %}
-{% include 'lib/webinterface/fragments/select_css.tpl' %}
-{% endblock %}
+{% block head_css %}{% include 'lib/webinterface/fragments/datatables_css.tpl' %}{% endblock %}
 
 {% block content %}
 <img id="img-buffer" src="/static/img/logo-100px.png" hidden>
@@ -23,26 +21,107 @@
                     tracking.
                     </p>
                     <p>
-                    <form action="/devices/add/{{phone_types.phone.device_type}}" method="post">
-                        <button type="submit" class="btn btn-primary col-xs-12">Add NEST</button>
+                        <strong>Add new phones:</strong>
+                    <form class="pull-left" role="form"  style="padding-right: 10px;" action="/devices/add/{{phonemodule.phone_types['phone']['device_type']}}" method="post">
+                        <button type="submit" class="btn btn-primary">Basic</button>
                     </form>
+                    <form class="pull-left" role="form"  style="padding-right: 10px;" action="/devices/add/{{phonemodule.phone_types['fax']['device_type']}}" method="post">
+                        <button type="submit" class="btn btn-primary">Fax</button>
+                    </form>
+                    <form class="pull-left" role="form"  style="padding-right: 10px;" action="/devices/add/{{phonemodule.phone_types['mobile']['device_type']}}" method="post">
+                        <button type="submit" class="btn btn-primary">Generic Mobile</button>
+                    </form>
+                    <form class="pull-left" role="form"  style="padding-right: 10px;" action="/devices/add/{{phonemodule.phone_types['android']['device_type']}}" method="post">
+                        <button type="submit" class="btn btn-primary">Android</button>
+                    </form>
+                    <form class="pull-left" role="form"  style="padding-right: 10px;" action="/devices/add/{{phonemodule.phone_types['apple']['device_type']}}" method="post">
+                        <button type="submit" class="btn btn-primary">Apple</button>
+                    </form>
+                    <div style="clear: both"></div>
                     </p>
+                    <p>
+                    </p>
+                    <br>
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <strong>Configured phones</strong>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <p>
-                            <form method="post" id="phones">
-                            {% for phone_id, device in phone.node.data['phones'].items() %}
-                            <label style="font-weight: 500;"><input name="devid_{{device_id}}" type="checkbox" value="1"
-                            {% if device_id in phone.node.data['phones']['allowed'] %} checked {% endif %}
-                            > {{ device.full_label}}</label><br>
-                            {% endfor %}
-                            <input type="hidden" name="json_output" id="json_output" value="">
-                            <button class="btn btn-primary btn-lg">Update Alexa Access</button>
-                            </form>
+<table width="100%" class="table table-striped table-bordered table-hover" id="requirements">
+    <thead>
+        <tr>
+            <th>Phone Name</th><th>Type</th><th>Notification Targets</th><th>User</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for phone_id, phone in yombo._DeviceTypes.devices_by_device_type(phonemodule.phone_types['phone']['device_type']).items() %}
+        <tr>
+            <td>
+                <strong><a href="/modules_settings/phone/{{phone_id}}/details">{{phone.label}}</a></strong><br>
+                {{phone.phone_number}}<br>
+                (<a href="/modules_settings/phone/{{phone_id}}/edit">edit</a>,
+                <a href="/devices/{{phone_id}}/details">device details</a>)
+            </td>
+            <td>Basic</td>
+            <td> {{phonemodule.node.data['phones'][phone_id]['targets']|join(', ')}}</td>
+            <td> {{phone.phone_user}}</td>
+        </tr>
+    {% endfor %}
+    {% for phone_id, phone in yombo._DeviceTypes.devices_by_device_type(phonemodule.phone_types['fax']['device_type']).items() %}
+        <tr>
+            <td>
+                <strong><a href="/modules_settings/phone/{{phone_id}}/details">{{phone.label}}</a></strong><br>
+                {{phone.phone_number}}<br>
+                (<a href="/modules_settings/phone/{{phone_id}}/edit">edit</a>,
+                <a href="/devices/{{phone_id}}/details">device details</a>)
+            </td>
+            <td>Fax</td>
+            <td> {{phonemodule.node.data['phones'][phone_id]['targets']|join(', ')}}</td>
+            <td> {{phone.phone_user}}</td>
+        </tr>
+    {% endfor %}
+    {% for phone_id, phone in yombo._DeviceTypes.devices_by_device_type(phonemodule.phone_types['mobile']['device_type']).items() %}
+        <tr>
+            <td>
+                <strong><a href="/modules_settings/phone/{{phone_id}}/details">{{phone.label}}</a></strong><br>
+                {{phone.phone_number}}<br>
+                (<a href="/modules_settings/phone/{{phone_id}}/edit">edit</a>,
+                <a href="/devices/{{phone_id}}/details">device details</a>)
+            </td>
+            <td>Generic Mobile</td>
+            <td> {{phonemodule.node.data['phones'][phone_id]['targets']|join(', ')}}</td>
+            <td> {{phone.phone_user}}</td>
+        </tr>
+    {% endfor %}
+    {% for phone_id, phone in yombo._DeviceTypes.devices_by_device_type(phonemodule.phone_types['android']['device_type']).items() %}
+        <tr>
+            <td>
+                <strong><a href="/modules_settings/phone/{{phone_id}}/details">{{phone.label}}</a></strong><br>
+                {{phone.phone_number}}<br>
+                (<a href="/modules_settings/phone/{{phone_id}}/edit">edit</a>,
+                <a href="/devices/{{phone_id}}/details">device details</a>)
+            </td>
+            <td>Android</td>
+            <td> {{phonemodule.node.data['phones'][phone_id]['targets']|join(', ')}}</td>
+            <td> {{phone.phone_user}}</td>
+        </tr>
+    {% endfor %}
+    {% for phone_id, phone in yombo._DeviceTypes.devices_by_device_type(phonemodule.phone_types['apple']['device_type']).items() %}
+        <tr>
+            <td>
+                <strong><a href="/modules_settings/phone/{{phone_id}}/details">{{phone.label}}</a></strong><br>
+                {{phone.phone_number}}<br>
+                (<a href="/modules_settings/phone/{{phone_id}}/edit">edit</a>,
+                <a href="/devices/{{phone_id}}/details">device details</a>)
+            </td>
+            <td>Apple</td>
+            <td> {{phonemodule.node.data['phones'][phone_id]['targets']|join(', ')}}</td>
+            <td> {{phone.phone_user}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
                             </p>
                         </div>
                     </div>
@@ -53,6 +132,8 @@
             <!-- /.row -->
 
 {% endblock %}
+{% block body_bottom_js %}{% include 'lib/webinterface/fragments/datatables_js.tpl' %}{% endblock %}
+
 {% block body_bottom %}
 {% include 'lib/webinterface/fragments/select_js.tpl' %}
     <script type="text/javascript" src="/static/js/jquery.serializejson.min.js"></script>

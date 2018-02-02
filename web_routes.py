@@ -30,56 +30,108 @@ def module_phone_routes(webapp):
 
         @webapp.route("/phone/index", methods=['GET'])
         @require_auth()
-        def page_module_index_get(webinterface, request, session):
-            phone = webinterface._Modules['Phone']
-            if phone.node is None:
-                page = webinterface.webapp.templates.get_template(webinterface._dir + '/pages/misc/stillbooting.html')
-                root_breadcrumb(webinterface, request)
-                return page.render(alerts=webinterface.get_alerts())
-
+        def page_module_phone_index_get(webinterface, request, session):
+            phonemodule = webinterface._Modules['Phone']
             page = webinterface.webapp.templates.get_template('modules/phone/web/index.html')
             root_breadcrumb(webinterface, request)
 
             return page.render(alerts=webinterface.get_alerts(),
-                               phone=phone,
+                               phonemodule=phonemodule,
                                )
 
-        @webapp.route("/phone/index", methods=['POST'])
+        @webapp.route("/phone/<string:device_id>/details", methods=['GET'])
         @require_auth()
-        def page_module_phone_index_post(webinterface, request, session):
-            phone = webinterface._Modules['Phone']
-            if phone.node is None:
+        def page_module_phone_details_get(webinterface, request, session, device_id):
+            phonemodule = webinterface._Modules['Phone']
+            if phonemodule.node is None:
                 page = webinterface.webapp.templates.get_template(webinterface._dir + '/pages/misc/stillbooting.html')
                 root_breadcrumb(webinterface, request)
                 return page.render(alerts=webinterface.get_alerts())
+
+            try:
+                device = webinterface._Devices[device_id]
+            except Exception as e:
+                webinterface.add_alert('Device ID was not found.  %s' % e, 'warning')
+                return webinterface.redirect(request, '/module_settings/phone')
+            page = webinterface.webapp.templates.get_template('modules/phone/web/details.html')
+            root_breadcrumb(webinterface, request)
+            webinterface.add_breadcrumb(request,
+                                        "/module_settings/phone/%s/details" % device_id,
+                                        "%s details" % device.label)
+            return page.render(alerts=webinterface.get_alerts(),
+                               phone=device,
+                               phonemodule=phonemodule,
+                               targets=webinterface._Notifications.notification_targets,
+                               # module_devices=phonemodule._module_devices_cached
+                               )
+
+        @webapp.route("/phone/<string:device_id>/edit", methods=['GET'])
+        @require_auth()
+        def page_module_phone_edit_get(webinterface, request, session, device_id):
+            phonemodule = webinterface._Modules['Phone']
+            if phonemodule.node is None:
+                page = webinterface.webapp.templates.get_template(webinterface._dir + '/pages/misc/stillbooting.html')
+                root_breadcrumb(webinterface, request)
+                return page.render(alerts=webinterface.get_alerts())
+
+            try:
+                device = webinterface._Devices[device_id]
+            except Exception as e:
+                webinterface.add_alert('Device ID was not found.  %s' % e, 'warning')
+                return webinterface.redirect(request, '/module_settings/phone')
+            page = webinterface.webapp.templates.get_template('modules/phone/web/edit.html')
+            root_breadcrumb(webinterface, request)
+            webinterface.add_breadcrumb(request,
+                                        "/module_settings/phone/%s/details" % device_id,
+                                        "%s details" % device.label)
+            webinterface.add_breadcrumb(request,
+                                        "/module_settings/phone/%s/edit" % device_id,
+                                        "Edit")
+            return page.render(alerts=webinterface.get_alerts(),
+                               phone=device,
+                               phonemodule=phonemodule,
+                               targets=webinterface._Notifications.notification_targets,
+                               nodedata=phonemodule.node.data
+                               # module_devices=phonemodule._module_devices_cached
+                               )
+
+        @webapp.route("/phone/<string:device_id>/edit", methods=['POST'])
+        @require_auth()
+        def page_module_phone_edit_post(webinterface, request, session, device_id):
+            phonemodule = webinterface._Modules['Phone']
+            if phonemodule.node is None:
+                page = webinterface.webapp.templates.get_template(webinterface._dir + '/pages/misc/stillbooting.html')
+                root_breadcrumb(webinterface, request)
+                return page.render(alerts=webinterface.get_alerts())
+
+            try:
+                device = webinterface._Devices[device_id]
+            except Exception as e:
+                webinterface.add_alert('Device ID was not found.  %s' % e, 'warning')
+                return webinterface.redirect(request, '/module_settings/phone')
 
             if 'json_output' in request.args:
                 json_output = request.args.get('json_output', [{}])[0]
                 json_output = json.loads(json_output)
-                # print("json_out: %s" % json_output)
-                allowed = []
-                for device_id, value in json_output.items():
-                    if value == '1':
-                        if device_id.startswith("devid_"):
-                            parts = device_id.split('_')
-                            device_id = parts[1]
-                            if device_id in phone._Devices:
-                                allowed.append(parts[1])
-
-                if 'devices' not in phone.node.data:
-                    phone.node.data['devices'] = {}
-                # if 'allowed' not in phone.node.data:
-                #     phone.node.data['devices']['allowed'] = {}
-                phone.node.data['devices']['allowed'] = allowed
-                phone.discovery(save=False)
+                print("json_output: %s" % json_output)
+                phonemodule.node.data['phones'][device_id]['targets'] = []
+                for input, value in json_output.items():
+                    print("got input: %s = %s" % (input, value))
+                    if input.startswith('target__'):
+                        items = input.split('__')
+                        print("New phone target: %s" % items[1])
+                        print("Phone data before: %s" % phonemodule.node.data['phones'])
+                        phonemodule.node.data['phones'][device_id]['targets'].append(items[1])
+                        print("Phone data after: %s" % phonemodule.node.data['phones'])
+                print("Phone data: %s" % phonemodule.node.data['phones'])
+                print("node data typoe: %s" % type(phonemodule.node.data))
+                phonemodule.node.save()
 
             page = webinterface.webapp.templates.get_template('modules/phone/web/index.html')
             root_breadcrumb(webinterface, request)
-
             return page.render(alerts=webinterface.get_alerts(),
-                               phone=phone,
+                               phonemodule=phonemodule,
                                )
-
 
     with webapp.subroute("/api/v1/extended") as webapp:
 

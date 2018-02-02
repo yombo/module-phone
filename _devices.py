@@ -11,13 +11,19 @@ class Phone(Device):
         self.TOGGLE_COMMANDS = []
 
         self.FEATURES.update({
+            'power_control': False,
+            'all_on': False,
+            'all_off': False,
+            'pingable': False,
+            'pollable': False,
+            'sends_updates': False,
             'has_bluetooth': False,
             'has_wifi': False,
             'receives_sms': False,
             'receives_images': False,
             'receives_calls': True,
-            'makes_sms': True,
-            'makes_images': True,
+            'makes_sms': False,
+            'makes_images': False,
             'makes_calls': True,
         })
 
@@ -47,7 +53,7 @@ class Phone(Device):
 
     @property
     def phone_user(self):
-        if 'phone_number' in self.device_variables_cached:
+        if 'phone_user' in self.device_variables_cached:
             return self.device_variables_cached['phone_user']['values'][0]
         return None
 
@@ -60,7 +66,7 @@ class Phone(Device):
         return None
 
 
-class FaxPhone(Phone):
+class Fax_Phone(Phone):
     """
     A fax based phone number.
     """
@@ -73,7 +79,7 @@ class FaxPhone(Phone):
         })
 
 
-class MobilePhone(Phone):
+class Mobile_Phone(Phone):
     """
     A generic
     """
@@ -105,7 +111,7 @@ class MobilePhone(Phone):
         })
 
 
-class AndroidPhone(MobilePhone):
+class Android_Phone(Mobile_Phone):
     """
     An Android device.
     """
@@ -114,7 +120,7 @@ class AndroidPhone(MobilePhone):
         self.SUB_PLATFORM = "android"
 
 
-class ApplePhone(MobilePhone):
+class Apple_Phone(Mobile_Phone):
     """
     Apple Phone.
     """
