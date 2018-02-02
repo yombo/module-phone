@@ -1,0 +1,70 @@
+{% extends "lib/webinterface/fragments/layout.tpl" %}
+{% import "lib/webinterface/fragments/macros.tpl" as macros%}
+{% block head_css %}
+{% include 'lib/webinterface/fragments/select_css.tpl' %}
+{% endblock %}
+
+{% block content %}
+<img id="img-buffer" src="/static/img/logo-100px.png" hidden>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Phone Module<br>
+                    </h1>
+                    <p></p>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>
+                    This module adds basic support for phones. By itself, it doesn't do much, however, other
+                    modules access the details to provide additional funcationality such as SMS and Bluetooth
+                    tracking.
+                    </p>
+                    <p>
+                    <form action="/devices/add/{{phone_types.phone.device_type}}" method="post">
+                        <button type="submit" class="btn btn-primary col-xs-12">Add NEST</button>
+                    </form>
+                    </p>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong>Configured phones</strong>
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <p>
+                            <form method="post" id="phones">
+                            {% for phone_id, device in phone.node.data['phones'].items() %}
+                            <label style="font-weight: 500;"><input name="devid_{{device_id}}" type="checkbox" value="1"
+                            {% if device_id in phone.node.data['phones']['allowed'] %} checked {% endif %}
+                            > {{ device.full_label}}</label><br>
+                            {% endfor %}
+                            <input type="hidden" name="json_output" id="json_output" value="">
+                            <button class="btn btn-primary btn-lg">Update Alexa Access</button>
+                            </form>
+                            </p>
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.col-lg-6 -->
+            </div>
+            <!-- /.row -->
+
+{% endblock %}
+{% block body_bottom %}
+{% include 'lib/webinterface/fragments/select_js.tpl' %}
+    <script type="text/javascript" src="/static/js/jquery.serializejson.min.js"></script>
+    <script>
+        $("#alexadevices").submit(function(event) {
+            console.log("asdf");
+            var rawData = $('#alexadevices').serializeJSON();
+            var formData = JSON.stringify(rawData);
+            console.log(formData);
+            $('#json_output').val(formData)
+            console.log(formData);
+        });
+    </script>
+
+{% endblock %}
