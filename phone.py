@@ -1,6 +1,6 @@
 """
 For details about this module visit:
-https://yombo.net/modules/twilio
+https://yombo.net/modules/phone
 
 Learn about at: https://yombo.net/
 Get started today: https://yg2.in/start
@@ -12,7 +12,6 @@ Get started today: https://yg2.in/start
 """
 import traceback
 
-from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks
 
 from yombo.core.log import get_logger
@@ -25,17 +24,18 @@ logger = get_logger('modules.phone')
 
 class Phone(YomboModule):
     """
-    Adds the concept of phones to the gateway.
+    Adds the concept of phones to the gateway. Allows users to add phone device types.
     """
     def _init_(self, **kwargs):
         """
+        Only allow the module to run if it's on the master gateway for a cluster.
 
         :param kwargs:
         :return:
         """
         self.is_master = self._Configs.get('core', 'is_master', True, False)
         if self.is_master is False:
-            logger.warn("Amazon Alexa disabled, only works on the master gateway of a cluster.")
+            logger.warn("Phone module disabled, only works on the master gateway of a cluster.")
             self._Notifications.add({'title': 'Phone module not started',
                                      'message': 'The phone module can only be used on a master gateway node.',
                                      'source': 'Phone Module',
@@ -59,13 +59,21 @@ class Phone(YomboModule):
 
     @inlineCallbacks
     def _start_(self, **kwargs):
+        """
+        Load the configuration node, otherwise create a new node if required.
+
+        :param kwargs:
+        :return:
+        """
         if self.is_master is False:
             return
 
-        nodes = self._Nodes.search({'node_type': 'module_phones'})
+        nodes = self._Nodes.search({'node_type': 'module_phone'})
         if len(nodes) == 0:
             logger.info("Phone creating new node...")
-            self.node = yield self._Nodes.create(node_type='module_phones',
+            self.node = yield self._Nodes.create(label='Module Phone',
+                                                 machine_label='module_phone',
+                                                 node_type='module_phone',
                                                  data={'phones': {}, 'configs': {}},
                                                  data_content_type='json',
                                                  gateway_id=self.gwid,
@@ -100,13 +108,13 @@ class Phone(YomboModule):
         :param kwargs:
         :return:
         """
-        if self._States['loader.operating_mode'] == 'run':
+        if self.is_master is True and self._States['loader.operating_mode'] == 'run':
             return {
                 'nav_side': [
                     {
                         'label1': 'Module Settings',
                         'label2': 'Phones',
-                        'priority1': 3400,  # Even with a value, 'Tools' is already defined and will be ignored.
+                        'priority1': 820,  # Even with a value, 'Tools' is already defined and will be ignored.
                         'priority2': 100,
                         'icon': 'fa fa-phone',
                         'url': '/modules_settings/phone/index',
@@ -125,7 +133,8 @@ class Phone(YomboModule):
     @inlineCallbacks
     def _notification_target_(self, **kwargs):
         """
-        Relays notification targets to phones.
+        Relays notification targets to sub-modules so they can optionally send
+        them to phones.
 
         :param kwargs:
         :return:

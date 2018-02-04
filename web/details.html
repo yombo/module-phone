@@ -7,7 +7,8 @@
             <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header">Phone details: {{phone.label}}<br>
-                    <a class="btn btn-md btn-primary" href="/modules_settings/phone/{{phone.device_id}}/edit">Edit</a>
+                    <a class="btn btn-md btn-primary" href="/modules_settings/phone/{{phone.device_id}}/edit">Edit Notification Targets</a>
+                    <a class="btn btn-md btn-primary" href="/devices/{{phone.device_id}}/edit">Edit Phone Number</a>
                     </h1>
                     <p></p>
                 </div>
@@ -18,13 +19,12 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <strong>Configuration Details</strong><br>
-                            Additional details for the phone: {{phone.label}}
+                            <strong>Phone Configuration Details</strong><br>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <p>
-                                Notification targets:
+                            <h4>Notification targets</h4>
 <table width="100%" class="table table-striped table-bordered table-hover" id="requirements">
     <thead>
         <tr>
@@ -33,8 +33,10 @@
     </thead>
     <tbody>
         <tr>
-            <td> {{phone.label}} </td>
-            <td> {{phonemodule.node.data['phones'][phone.device_id]['targets']|join(', ')}}  </td>
+            <td> {{phone.label}} ({{phone.phone_number}})</td>
+            <td> {% if phonemodule.node.data['phones'][phone.device_id]['targets']|length > 0 -%}
+                {{phonemodule.node.data['phones'][phone.device_id]['targets']|join(', ')}}
+            {%- else -%} No notification targets applied. {% endif %}</td>
         </tr>
     </tbody>
 </table>

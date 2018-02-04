@@ -1,9 +1,18 @@
+"""
+Adds new device types:
+Phone - basic phone
+Fax - A phone with a fax machine attached.
+Module - A generic mobile phone.
+Android - A phone running Google Android
+Apple - A phone running Apple IOS
+
+"""
 from yombo.lib.devices._device import Device
 
 
 class Phone(Device):
     """
-    A generic
+    A generic phone.
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -81,7 +90,7 @@ class Fax_Phone(Phone):
 
 class Mobile_Phone(Phone):
     """
-    A generic
+    A generic mobile phone.
     """
     @property
     def bluetooth_address(self):
@@ -113,7 +122,7 @@ class Mobile_Phone(Phone):
 
 class Android_Phone(Mobile_Phone):
     """
-    An Android device.
+    An Android phone.
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -122,7 +131,7 @@ class Android_Phone(Mobile_Phone):
 
 class Apple_Phone(Mobile_Phone):
     """
-    Apple Phone.
+    An Apple Phone.
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

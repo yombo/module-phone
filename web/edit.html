@@ -7,8 +7,8 @@
 {% block content %}
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header"><a class="success" href="/modules_configs/phone/{{ phone.device_id }}/details" aria-label="Details">
-  <i class="fa fa-arrow-left" aria-hidden="true"></i></a> {{ header_label}}</h1>
+                    <h1 class="page-header"><a class="success" href="/modules_settings/phone/{{ phone.device_id }}/details" aria-label="Details">
+  <i class="fa fa-arrow-left" aria-hidden="true"></i></a> Edit phone targets: {{phone.label}}</h1>
                     <p></p>
                 </div>
                 <!-- /.col-lg-12 -->
@@ -23,24 +23,19 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div class="form-group">
-                                <label style="font-size: 1.2em; margin-top: 10px; margin-bottom: 0px">Notification Targets: </label>
-                                <a href="#" data-toggle="modal" data-target="#targetsmodel"><i class="fa fa-question fa-lg"></i></a>
-                                {{ macros.modal("targetsmodel", 'Notification Targets', '
-                                <p>Notification targets allow you to select which notifications a phone should receive.</p>
-                                ') }}
-                                <br><br>
-                                <div class="input-group">
-                                  {% for target, target_data in targets.items() -%}
-                                    <label for="target__{{target}}">
-                                    <input  type="checkbox" name="target__{{target}}" id="target1__{{target}}" value="1" {%
-                                    if target in nodedata['phones'][phone.device_id]['targets'] %} checked {% endif %}>
-                                    {{target_data[0]['description']}} ({{target}})</label>
-                                    <br>
-                                  {% endfor %}
-                                </div>
-                            </div>
-
+                            <p>
+                            <label style="font-size: 1.2em; margin-top: 10px; margin-bottom: 0px">Notification Targets: </label>
+                            <a href="#" data-toggle="modal" data-target="#targetsmodel"><i class="fa fa-question fa-lg"></i></a>
+                            {{ macros.modal("targetsmodel", 'Notification Targets', '
+                            <p>Notification targets allow you to select which notifications a phone should receive.</p>
+                            ') }}
+                              {% for target, target_data in targets.items() -%}
+                                <label style="font-weight: 500;"><input  type="checkbox" name="target__{{target}}" id="target1__{{target}}" value="1" {%
+                                if target in nodedata['phones'][phone.device_id]['targets'] %} checked {% endif %}>
+                                {{target_data[0]['description']}} ({{target}})</label><br>
+                              {% endfor %}
+                            </p>
+                            <br>
                         <input type="hidden" name="json_output" id="json_output" value="">
                         <a class="btn btn-md btn-danger" href="/modules_configs/phone/{{phone.device_id}}/details">Cancel</a>
                         <button type="submit" class="btn btn-success">Save Settings</button>

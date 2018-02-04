@@ -52,16 +52,16 @@ def module_phone_routes(webapp):
                 device = webinterface._Devices[device_id]
             except Exception as e:
                 webinterface.add_alert('Device ID was not found.  %s' % e, 'warning')
-                return webinterface.redirect(request, '/module_settings/phone')
+                return webinterface.redirect(request, '/modules_settings/phone')
             page = webinterface.webapp.templates.get_template('modules/phone/web/details.html')
             root_breadcrumb(webinterface, request)
             webinterface.add_breadcrumb(request,
-                                        "/module_settings/phone/%s/details" % device_id,
+                                        "/modules_settings/phone/%s/details" % device_id,
                                         "%s details" % device.label)
             return page.render(alerts=webinterface.get_alerts(),
                                phone=device,
                                phonemodule=phonemodule,
-                               targets=webinterface._Notifications.notification_targets,
+                               targets=sorted(webinterface._Notifications.notification_targets),
                                # module_devices=phonemodule._module_devices_cached
                                )
 
@@ -78,14 +78,14 @@ def module_phone_routes(webapp):
                 device = webinterface._Devices[device_id]
             except Exception as e:
                 webinterface.add_alert('Device ID was not found.  %s' % e, 'warning')
-                return webinterface.redirect(request, '/module_settings/phone')
+                return webinterface.redirect(request, '/modules_settings/phone')
             page = webinterface.webapp.templates.get_template('modules/phone/web/edit.html')
             root_breadcrumb(webinterface, request)
             webinterface.add_breadcrumb(request,
-                                        "/module_settings/phone/%s/details" % device_id,
+                                        "/modules_settings/phone/%s/details" % device_id,
                                         "%s details" % device.label)
             webinterface.add_breadcrumb(request,
-                                        "/module_settings/phone/%s/edit" % device_id,
+                                        "/modules_settings/phone/%s/edit" % device_id,
                                         "Edit")
             return page.render(alerts=webinterface.get_alerts(),
                                phone=device,
@@ -108,7 +108,7 @@ def module_phone_routes(webapp):
                 device = webinterface._Devices[device_id]
             except Exception as e:
                 webinterface.add_alert('Device ID was not found.  %s' % e, 'warning')
-                return webinterface.redirect(request, '/module_settings/phone')
+                return webinterface.redirect(request, '/modules_settings/phone')
 
             if 'json_output' in request.args:
                 json_output = request.args.get('json_output', [{}])[0]
